@@ -1,0 +1,272 @@
+yaml
+---
+- name: Secure Server Setup
+ hosts: all
+ become: yes
+ vars:
+    user_name: "{{ user_name }}"
+    user_password: "{{ user_password }}"
+    ssh_key_path: "{{ ssh_key_path }}"
+ tasks:
+    - name: Ensure unattended-upgrades is installed and configured
+      apt:
+        name: unattended-upgrades
+        state: present
+      notify: Enable unattended upgrades
+    - name: Create a new user with sudo privileges
+      user:
+        name: "{{ user_name }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        groups: sudo
+        append: yes
+    - name: Secure SSH
+      block:
+        - name: Disable root login
+          lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '^PermitRootLogin'
+            line: 'PermitRootLogin no'
+          notify: Restart SSH
+        - name: Disable empty passwords
+          lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '^PermitEmptyPasswords'
+            line: 'PermitEmptyPasswords no'
+          notify: Restart SSH
+        - name: Generate or use provided SSH key
+          include_tasks: generate_ssh_key.yml
+    - name: Update firewall rules
+      ufw:
+        rule: deny
+        port: "{{ item }}"
+      loop:
+        - 20/tcp
+        - 21/tcp
+        - 2/tcp
+        - 23/tcp
+        - 25/tcp
+        - 10/tcp
+        - 19/tcp
+        - 135/tcp
+        - 137/tcp
+        - 138/tcp
+        - 139/tcp
+        - 143/tcp
+        - 45/tcp
+        - 512/tcp
+        - 513/tcp
+        - 514/tcp
+        - 515/tcp
+        - 520/tcp
+        - 521/tcp
+        - 52/tcp
+        - 523/tcp
+        - 524/tcp
+        - 525/tcp
+        - 526/tcp
+        - 527/tcp
+        - 528/tcp
+        - 529/tcp
+        - 530/tcp
+        - 531/tcp
+        - 532/tcp
+        - 53/tcp
+        - 534/tcp
+        - 535/tcp
+        - 536/tcp
+        - 537/tcp
+        - 538/tcp
+        - 539/tcp
+        - 540/tcp
+        - 541/tcp
+        - 542/tcp
+        - 543/tcp
+        - 54/tcp
+        - 545/tcp
+        - 546/tcp
+        - 547/tcp
+        - 548/tcp
+        - 549/tcp
+        - 50/tcp
+        - 51/tcp
+        - 52/tcp
+        - 53/tcp
+        - 54/tcp
+        - 5/tcp
+        - 56/tcp
+        - 57/tcp
+        - 58/tcp
+        - 59/tcp
+        - 560/tcp
+        - 561/tcp
+        - 562/tcp
+        - 563/tcp
+        - 564/tcp
+        - 565/tcp
+        - 56/tcp
+        - 567/tcp
+        - 568/tcp
+        - 569/tcp
+        - 570/tcp
+        - 571/tcp
+        - 572/tcp
+        - 573/tcp
+        - 574/tcp
+        - 575/tcp
+        - 576/tcp
+        - 57/tcp
+        - 578/tcp
+        - 579/tcp
+        - 580/tcp
+        - 581/tcp
+        - 582/tcp
+        - 583/tcp
+        - 584/tcp
+        - 585/tcp
+        - 586/tcp
+        - 587/tcp
+        - 58/tcp
+        - 589/tcp
+        - 590/tcp
+        - 591/tcp
+        - 592/tcp
+        - 593/tcp
+        - 594/tcp
+        - 595/tcp
+        - 596/tcp
+        - 597/tcp
+        - 598/tcp
+        - 59/tcp
+        - 60/tcp
+        - 601/tcp
+        - 602/tcp
+        - 603/tcp
+        - 604/tcp
+        - 605/tcp
+        - 606/tcp
+        - 607/tcp
+        - 608/tcp
+        - 609/tcp
+        - 610/tcp
+        - 61/tcp
+        - 612/tcp
+        - 613/tcp
+        - 614/tcp
+        - 615/tcp
+        - 616/tcp
+        - 617/tcp
+        - 618/tcp
+        - 619/tcp
+        - 620/tcp
+        - 621/tcp
+        - 62/tcp
+        - 623/tcp
+        - 624/tcp
+        - 625/tcp
+        - 626/tcp
+        - 627/tcp
+        - 628/tcp
+        - 629/tcp
+        - 630/tcp
+        - 631/tcp
+        - 632/tcp
+        - 63/tcp
+        - 634/tcp
+        - 635/tcp
+        - 636/tcp
+        - 637/tcp
+        - 638/tcp
+        - 639/tcp
+        - 640/tcp
+        - 641/tcp
+        - 642/tcp
+        - 643/tcp
+        - 64/tcp
+        - 645/tcp
+        - 646/tcp
+        - 647/tcp
+        - 648/tcp
+        - 649/tcp
+        - 650/tcp
+        - 651/tcp
+        - 652/tcp
+        - 653/tcp
+        - 654/tcp
+        - 65/tcp
+        - 656/tcp
+        - 657/tcp
+        - 658/tcp
+        - 659/tcp
+        - 60/tcp
+        - 61/tcp
+        - 62/tcp
+        - 63/tcp
+        - 64/tcp
+        - 65/tcp
+        - 6/tcp
+        - 67/tcp
+        - 68/tcp
+        - 69/tcp
+        - 670/tcp
+        - 671/tcp
+        - 672/tcp
+        - 673/tcp
+        - 674/tcp
+        - 675/tcp
+        - 676/tcp
+        - 67/tcp
+        - 678/tcp
+        - 679/tcp
+        - 680/tcp
+        - 681/tcp
+        - 682/tcp
+        - 683/tcp
+        - 684/tcp
+        - 685/tcp
+        - 686/tcp
+        - 687/tcp
+        - 68/tcp
+        - 689/tcp
+        - 690/tcp
+        - 691/tcp
+        - 692/tcp
+        - 693/tcp
+        - 694/tcp
+        - 695/tcp
+        - 696/tcp
+        - 697/tcp
+        - 698/tcp
+        - 69/tcp
+        - 70/tcp
+        - 701/tcp
+        - 702/tcp
+        - 703/tcp
+        - 704/tcp
+        - 705/tcp
+        - 706/tcp
+        - 707/tcp
+        - 708/tcp
+        - 709/tcp
+        - 710/tcp
+        - 71/tcp
+        - 712/tcp
+        - 713/tcp
+        - 714/tcp
+        - 715/tcp
+        - 716/tcp
+        - 717/tcp
+        - 718/tcp
+        - 719/tcp
+        - 720/tcp
+        - 721/tcp
+        - 72/tcp
+        - 623/tcp
+        - 724/tcp
+        - 725/tcp
+        - 726/tcp
+        - 727/tcp
+        - 728/tcp
+        - 729/tcp
+        - 730/tcp
+        - 731/tcp
+        - 732/tcp

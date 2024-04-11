@@ -1,6 +1,6 @@
 #!/bin/bash
 # Define the playbook file path
-PLAYBOOK_FILE="/ansible-secure-server/secure-server-setup.yml"
+PLAYBOOK_FILE="~/ansible-secure-server/secure-server-setup.yml"
 # Function to install Ansible
 install_ansible() {
     echo "Installing Ansible..."

@@ -1,5 +1,6 @@
 - name: Secure Server Setup
-  hosts: all
+  hosts: localhost
+  connection: local
   become: yes
   vars:
     user_name: "{{ user_name }}"

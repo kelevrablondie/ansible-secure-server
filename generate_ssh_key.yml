@@ -1,0 +1,42 @@
+# generate_ssh_key.yml
+
+- name: Check if SSH key exists
+  stat:
+    path: "{{ ssh_key_path }}"
+  register: ssh_key_exists
+
+- name: Generate SSH key if it doesn't exist
+  when: not ssh_key_exists.stat.exists
+  command: ssh-keygen -t rsa -b 4096 -C "your_email@example.com" -f "{{ ssh_key_path }}"
+  args:
+    creates: "{{ ssh_key_path }}"
+  register: ssh_key_generation_result
+  changed_when: ssh_key_generation_result.rc != 2
+
+- name: Provide instructions to add SSH key to client
+  when: not ssh_key_exists.stat.exists or ssh_key_generation_result.changed
+  debug:
+    msg: |
+      ********************************************
+      *                                          *
+      *   SSH key generated successfully!        *
+      *   Add the following SSH key to your     *
+      *   client's authorized_keys file:        *
+      *                                          *
+      *   {{ lookup('file', ssh_key_path + '.pub') }}    *
+      *                                          *
+      ********************************************
+  tags: ssh_key
+
+- name: Allow user to input existing SSH key
+  when: ssh_key_exists.stat.exists
+  pause:
+    prompt: "Enter your existing SSH public key (or press Enter to continue without providing a key): "
+  register: ssh_key_input
+  tags: ssh_key
+
+- name: Check if user provided an SSH key
+  when: ssh_key_input.user_input is not none
+  fail:
+    msg: "You provided an SSH key. Please add it manually to the authorized_keys file."
+  tags: ssh_key

@@ -1,5 +1,3 @@
-yaml
----
 - name: Secure Server Setup
  hosts: all
  become: yes

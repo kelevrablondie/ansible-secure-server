@@ -31,8 +31,7 @@ Ensure you have the following installed on your system:
 This playbook will configure your server according to the settings
  defined within `secure_server_setup.yml`. Bash script should run the playbook after it made sure that the latest Ansible is installed.
 ## Contributing
-Contributions are welcome! Please read the [contributing guidelines](CONT
-RIBUTING.md) before getting started.
+Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTING.md) before getting started.
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE
 ) file for details.
